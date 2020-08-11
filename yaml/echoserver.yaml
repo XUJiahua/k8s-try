@@ -1,0 +1,39 @@
+# reference:
+# https://github.com/kubernetes/examples/blob/master/guestbook/all-in-one/guestbook-all-in-one.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: echoserver
+  labels:
+    app: echoserver
+    tier: backend
+spec:
+  type: NodePort
+  ports:
+    - port: 7893
+  selector:
+    app: echoserver
+    tier: backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echoserver
+spec:
+  selector:
+    matchLabels:
+      app: echoserver
+      tier: backend
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: echoserver
+        tier: backend
+    spec:
+      containers:
+        - name: echoserver
+          image: cil/echoserver:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 7893
