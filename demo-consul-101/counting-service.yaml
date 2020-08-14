@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: counting-service
+  labels:
+    app: counting-service
+    tier: backend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9001
+  selector:
+    app: counting-service
+    tier: backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: counting-service
+spec:
+  selector:
+    matchLabels:
+      app: counting-service
+      tier: backend
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: counting-service
+        tier: backend
+    spec:
+      containers:
+        - name: counting-service
+          image: hashicorp/counting-service:0.0.2
+          env:
+            - name: PORT
+              value: "9001"
+          ports:
+            - containerPort: 9001
