@@ -75,9 +75,14 @@ func EchoHandler(writer http.ResponseWriter, request *http.Request) {
 	request.Write(writer)
 }
 
+func KillMyself(w http.ResponseWriter, r *http.Request) {
+	go panic("to be or not to be, it's a ...")
+}
+
 func main() {
 	log.Println("starting server, listening on port " + getServerPort())
 
 	http.HandleFunc("/", EchoHandler)
+	http.HandleFunc("/kill", KillMyself)
 	http.ListenAndServe(":"+getServerPort(), nil)
 }

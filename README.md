@@ -100,10 +100,50 @@ IP:           172.17.0.8
 
 ```
 
+### 自动恢复实例数
+
+echoserver 的实现带有缺陷，/kill 接口会触发panic。
+即便如此，k8s检查到pod数不满足配置要求，会自动恢复。
+
+```
+# 获取service地址
+kubectl get svc
+
+NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+echoserver          NodePort    10.111.55.193    <none>        7893:31126/TCP   47h
+
+# 正常请求
+curl localhost:31126
+
+# 自杀请求
+curl localhost:31126/kill
+
+# 查看 Pod 状态
+kubectl get pods
+
+NAME                                 READY   STATUS    RESTARTS   AGE
+echoserver-54977dcf58-2nhxf          1/1     Running   0          4m59s
+echoserver-54977dcf58-4h4wl          0/1     Error     1          4m59s
+echoserver-54977dcf58-kr4cc          1/1     Running   0          4m59s
+
+# 自动恢复
+kubectl get pods
+
+NAME                                 READY   STATUS    RESTARTS   AGE
+echoserver-54977dcf58-2nhxf          1/1     Running   0          5m22s
+echoserver-54977dcf58-4h4wl          1/1     Running   2          5m22s
+echoserver-54977dcf58-kr4cc          1/1     Running   0          5m22s
+```
+
+
 ### Service的类型
 K8S VM 内可以访问 ClusterIP，包括 Service的和Pod的。
 非K8S集群的主机是无法访问 ClusterIP的。需要通过NodePort/LoadBalancer的形式暴露服务。
 
+NodePort 会在cluster内的每个node打开端口，访问任一node_ip+node_port就可访问service。但是不建议生产使用。
+The NodePort abstraction is intended to be a building block for higher-level ingress models (e.g., load balancers). It is handy for development purposes, however, when you don’t need a production URL.
+
+LoadBalancer : exact implementation of a LoadBalancer is dependent on your cloud provider
 
 ## demo-consul-101 
 
