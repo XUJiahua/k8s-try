@@ -23,6 +23,9 @@ sudo su
 make minikube-start
 ```
 
+参考：
+1. install kubectl/minikube https://kubernetes.io/docs/tasks/tools/
+
 ### 打开 dashboard
 
 dashboard的作用：
